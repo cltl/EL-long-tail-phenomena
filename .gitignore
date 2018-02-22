@@ -1,0 +1,11 @@
+img/
+*.bin
+*.rdf
+.ipynb_checkpoints/
+__pycache__/
+data/
+to_cache/
+*.tsv
+*.pyc
+resources/
+naf/
