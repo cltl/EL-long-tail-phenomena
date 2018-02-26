@@ -13,179 +13,75 @@ from scipy.stats import pearsonr, spearmanr
 import seaborn as sns
 import pandas as pd
 
-def calculate_slope(cnt):
-	y = OrderedDict(cnt.most_common())
-	v=np.log(list(y.values()))
-	k=np.log(np.arange(1,len(v)+1,1))
-	return linregress(k,v)
+############## MAIN PLOTTING FUNCTIONS ###############################
 
-def get_mention_counts(articles, skip_nils=True):
-	gold_forms=[]
-	gold_links=[]
-	for example_article in articles:
-		for entity in example_article.entity_mentions:
-			mention=entity.mention
-			meaning=entity.gold_link
-			if not skip_nils or meaning!='--NME--':
-				gold_forms.append(mention)
-				gold_links.append(meaning)
-	cnt_instances=Counter(gold_links)
-	cnt_forms=Counter(gold_forms)
-	return cnt_instances, cnt_forms
-
-def get_pageranks(articles, skip_zeros=False):
-
-	pageranks = {}
-	pagerank_frequency=defaultdict(int)
-
-	pr_uniq_sets=defaultdict(set)
-	for article in articles:
-		for mention in article.entity_mentions:
-			h=int(mention.gold_pr/1)
-			if not skip_zeros or h!=0:
-				pagerank_frequency[h]+=1
-				pr_uniq_sets[h].add(mention.gold_link)
-			pageranks[mention.gold_link]=h
-	pr_uniq=defaultdict(int)
-	for k,v in pr_uniq_sets.items():
-		pr_uniq[k]=len(v)
-	return pagerank_frequency, pr_uniq, pageranks
-
-def get_interpretations_and_references(articles, skip_nils=True):
-	interpretations=defaultdict(set)
-	references = defaultdict(set)
-	for article in articles:
-		for mention in article.entity_mentions:
-			form=mention.mention
-			meaning=mention.gold_link
-			if not skip_nils or meaning!='--NME--':
-		    		interpretations[form].add(meaning)
-			if meaning!='--NME--':
-		    		references[meaning].add(form)
-	return interpretations, references
-
-def get_instance_distribution(articles, instance):
-        references = defaultdict(int)
-        for article in articles:
-                for mention in article.entity_mentions:
-                        form=mention.mention
-                        meaning=mention.gold_link
-                        if meaning==instance:
-                                references[form]+=1
-        return sorted(references.items(), key=lambda x: x[1], reverse=True)
-
-def get_form_distribution(articles, the_form):
-	instances = get_inst_with_counts(articles, the_form)
-	return sorted(instances.items(), key=lambda x: x[1], reverse=True)
-
-def get_inst_with_counts(articles, the_form):
-        instances = defaultdict(int)
-        for article in articles:
-                for mention in article.entity_mentions:
-                        form=mention.mention
-                        meaning=mention.gold_link
-                        if form==the_form and meaning!='--NME--':
-                                instances[meaning]+=1
-        return instances
-
-def get_form_counts(articles, the_form):
-	instances = get_inst_with_counts(articles, the_form)
-	return instances.values()
-
-def compute_accuracy_by_form(articles, skip_nils=True):
-    forms_acc = defaultdict(int)
-    
-    correct_by_form = defaultdict(int)
-    total_by_form = defaultdict(int)
-
-    forms_by_count=defaultdict(set)
-    
-    for article in articles:
-        for entity in article.entity_mentions:
-            if entity.sys_link and (not skip_nils or entity.gold_link!='--NME--'):
-                if entity.sys_link==entity.gold_link:
-                    correct_by_form[entity.mention]+=1
-                total_by_form[entity.mention]+=1
-
-    for form, count in total_by_form.items():
-        forms_by_count[count].add(form)
-        forms_acc[form]=correct_by_form[form]*100.0/count
-    
-    return forms_acc, forms_by_count
-
-def compute_accuracy_by_uri(articles, skip_nils=True):
-	uris_acc = defaultdict(int)
-	correct_by_uri = defaultdict(int)
-	total_by_uri = defaultdict(int)
-
-	uris_by_count = defaultdict(set)
-
-	for article in articles:
-		for entity in article.entity_mentions:
-			if entity.sys_link and (not skip_nils or entity.gold_link!='--NME--'):
-				if entity.sys_link==entity.gold_link:
-					correct_by_uri[entity.gold_link]+=1
-				total_by_uri[entity.gold_link]+=1
-	for uri, count in total_by_uri.items():
-		uris_by_count[count].add(uri)
-		uris_acc[uri]=correct_by_uri[uri]*100.0/count
-
-	return uris_acc, uris_by_count
-
-def prepare_scatter_plot(dist1, dist2):
-	x_dist = []
-	y_dist = []
-	for i, freq in dist1.items():
-		if i not in dist2:
-			continue
-		x_dist.append(freq)
-		y_dist.append(dist2[i])
-	x_dist=np.array(x_dist)
-	y_dist=np.array(y_dist)
-	return x_dist, y_dist
-
-def scatter_plot(dist1, dist2, x_axis='', y_axis='', title='', save=False, limit=100000, degree=1, labels=None):
-	#colors = ['teal', 'yellowgreen', 'gold', 'red', 'blue']
-	lw=2
-
-	#dist1=dist1[:limit]
-	#dist2=dist2[:limit]
-
+def plot_freq_dist(cnt, title=None, x_axis='Entity mentions', loglog=False, b=2, save=False):
+	"""
+	Plot a frequency distribution from a dictionary where keys are strings, and values are their frequencies.
+	"""
 	fig = plt.figure()
 
-	plt.scatter(dist1, dist2, color='navy', marker='o', label="training points")
-	X = dist1[:, np.newaxis]
-	model = make_pipeline(PolynomialFeatures(degree), Ridge())
-	model.fit(X, dist2)
-	y_plot = model.predict(X)
-	plt.plot(dist1, y_plot, color='teal', linewidth=lw,
-	     label="Regression fit degree %d" % degree)
-
+	y = OrderedDict(cnt.most_common())
+	v=list(y.values())
+	k=np.arange(0,len(v),1)
+	if loglog:
+		plt.loglog(k,v, basex=b)
+	else:
+		plt.plot(k,v)
+	plt.ylabel('Frequency')
 	plt.xlabel(x_axis)
-	plt.ylabel(y_axis)
-	plt.title(title)
-
-	if labels:
-		for i in range(0, len(dist2)):
-			xy=(dist1[i], dist2[i])
-			plt.annotate(labels[i], xy,
-				xytext=(-20, 20),
-				textcoords='offset points', ha='right', va='bottom',
-				bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
-				arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
-
-	legend = plt.legend(loc='upper left', frameon=1)
-	frame = legend.get_frame()
-	frame.set_edgecolor('gray')
-	plt.show()
-
-	if save:
-		if title:
-			fig.savefig('img/%s.png' % title.lower().replace(' ', '_'), bbox_inches='tight')
+	if title:
+		if loglog:
+			p_title = 'Distribution of %s (log-log)' % title
 		else:
-			fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
+			p_title = 'Distribution of %s' % title
+		plt.title(p_title)
+	plt.show()
+	if save:
+		if title:		
+			fig.savefig('img/%s.png' % p_title.lower().replace(' ', '_'), bbox_inches='tight')
+		else:
+			fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')	
 
-def plot_line_with_whiskers(x, y, xl='', yl='', title='Correlation', estimators=['mean', 'median'], xlim=None, save=False):
+def plot_multi_freq_dist(forms_cnt, kind='', x_axis='Entity mentions', loglog=False, b=2, save=False):
+    """
+    Plot multiple frequency distributions from multiple dictionaries where keys are strings, and values are their frequencies.
+    """
+    fig = plt.figure()
+    cnt=0
+    scales=['0.1', '0.5']
+    for title, data_forms_cnt in forms_cnt.items():
+        gray_level=scales[cnt]
+        print(title)
+        y = OrderedDict(data_forms_cnt.most_common())
+        v=list(y.values())
+        k=np.arange(0,len(v),1)
+        if loglog:
+                plt.loglog(k,v, basex=b, label=title.upper(), color=gray_level)
+        else:
+                plt.plot(k,v, color=gray_level, label=title.upper())
+        cnt+=1
+    plt.legend(loc='upper right', frameon=1)
+    plt.ylabel('Frequency')
+    plt.xlabel(x_axis)
+    if kind:
+        if loglog:
+                p_title = 'Log-Log distribution of %s' % kind
+        else:
+                p_title = 'Distribution of %s' % kind
+        plt.title(p_title)
+    plt.show()
+    if save:
+            if title:
+                    fig.savefig('img/%s.png' % p_title.lower().replace(' ', '_'), bbox_inches='tight')
+            else:
+                    fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
+
+
+def plot_line_with_whiskers(x, y, xl='', yl='', title='', estimators=['mean', 'median'], xlim=None, save=False):
+    """
+    Plot a line with whiskers, showing a standard deviation from the estimator.
+    """
     for est in estimators:
         fig = plt.figure()
 
@@ -199,8 +95,9 @@ def plot_line_with_whiskers(x, y, xl='', yl='', title='Correlation', estimators=
         else: # median
             ax = sns.pointplot(x=xl, y=yl, data=df, estimator=median)
 
-        plt_title='%s (estimator=%s)' % (title, est)
-        plt.title(plt_title)
+        if title:
+            plt_title='%s (estimator=%s)' % (title, est)
+            plt.title(plt_title)
 
         if xlim:
                 ax.set(xlim=(xlim[0], xlim[1]))
@@ -209,93 +106,31 @@ def plot_line_with_whiskers(x, y, xl='', yl='', title='Correlation', estimators=
         plt.show()
 
         if save:
-            fig.savefig('img/%s.png' % plt_title)
+            if title:
+                fig.savefig('img/%s.png' % plt_title)
+            else:
+                fig.savefig('img/%d.png' % random.randint(0,1000000))
 
-def prepare_box_plot(x,y):
-	i=0
-	agg_freq_per_amb = defaultdict(list)
-	while i<len(x):
-		amb=x[i]
-		freq=y[i]
-		agg_freq_per_amb[amb].append(freq)
-		#    print(amb,freq)
-		i+=1
-	bp_data = []
-	for amb in range(1, max(x)+1):
-		bp_data.append(agg_freq_per_amb[amb])
-	return bp_data
-
-def box_plot(dists, x_axis='', y_axis='', title='', y_lim=-1, save=False):
-	fig=plt.figure(1, figsize=(9, 6))
-
-	ax = fig.add_subplot(111)
-	
-	bp = ax.boxplot(dists)
-	ax.set_xlabel(x_axis)
-	ax.set_ylabel(y_axis)
-	ax.set_title(title)
-
-	if y_lim!=-1:
-		ax.set_ylim([0, y_lim])
-
-	if save:
-		if title:
-			fig.savefig('img/%s.png' % title.lower().replace(' ', '_'), bbox_inches='tight')
-		else:
-			fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
-
-def annotated_heatmap(x_labels, y_labels, values, x_lbl='levels'):
-
-    x=[]
-    y=[]
-    vals=[]
-    i=0
-    for x_val in x_labels:
-        for y_val in y_labels:
-            x.append(x_val)
-            y.append(y_val)
-            vals.append(values[i])
-            i+=1
-    print(x, y, vals)
-
-    data={}
-    data['dataset']=x
-    data[x_lbl]=y
-    data['values']=vals
-    
-    fig, ax = plt.subplots(figsize=(len(y_labels)+3,0.75*len(x_labels)))         # Sample figsize in inches
-    
-    df = pd.DataFrame.from_dict(data)
-    
-    result = df.pivot(index='dataset', columns=x_lbl, values='values')
-
-    print(result)
-    ax = sns.heatmap(data=result, annot=True, fmt="d", cmap='cubehelix', )
-    
-    fig.savefig('img/%s.png' % x_lbl)
-
-def autolabelh(rects, ax):
+def multi_plot_line_with_whiskers(x, y, xl='', yl='', a=None, xlim=None, save=False, system=''):
     """
-    Attach a text label above each bar displaying its height
+    Plot multiple lines on the same line plot figure with whiskers.
     """
-    for rect in rects:
-        width = rect.get_width()
-        ax.text(1.05*width, rect.get_y() + rect.get_height()/2.,
-                int(width),
-               va='center')
+    amb_data = {xl: x,
+                yl: y}
 
-def autolabel(rects, ax):
-	"""
-	Attach a text label above each bar displaying its height
-	"""
-	for rect in rects:
-		height = rect.get_height()
-		print(height)
-		ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
-			round(height,2), fontsize=10,
-			ha='center', va='bottom')
+    df = pd.DataFrame(amb_data)
+
+    ax = sns.pointplot(x=xl, y=yl, data=df, ax=a)
+    ax.set_title(system.upper())
+
+    if xlim:
+            ax.set(xlim=(xlim[0], xlim[1]))
+    ax.set(ylim=(0, 100.0))
 
 def plot_scores(scores, title=''):
+	"""
+	Plot multiple bar plots, one per system. Each plot shows the system performance across different evaluation categories.
+	"""
 	dpoints = np.array(scores)
 
 	plt.gray()
@@ -345,58 +180,65 @@ def plot_scores(scores, title=''):
 	else:
 		fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
 
-def plot_freq_dist(cnt, title=None, x_axis='Entity mentions', loglog=False, b=2, save=False):
-	fig = plt.figure()
+def plot_prf(data, systems, a, maxrank=12, title=''):
+    """
+    Plot precision, recall, and F1 for different ranks.
+    """
+    a_list=[]
+    for rank in range(1,maxrank+1):
+        s=0
+        for system in systems:
+            s+=data[system][rank]
+        a_list.append(s/len(systems))
+    print(np.arange(1,maxrank+1))
+    a.plot(np.arange(1,maxrank+1), a_list, 'b-o')
+    a.set_xlabel("Rank")
+    a.set_title(title)
 
-	y = OrderedDict(cnt.most_common())
-	v=list(y.values())
-	k=np.arange(0,len(v),1)
-	if loglog:
-		plt.loglog(k,v, basex=b)
-	else:
-		plt.plot(k,v)
-	plt.ylabel('Frequency')
-	plt.xlabel(x_axis)
-	if title:
-		if loglog:
-			p_title = 'Distribution of %s (log-log)' % title
-		else:
-			p_title = 'Distribution of %s' % title
-		plt.title(p_title)
-	plt.show()
-	if save:
-		if title:		
-			fig.savefig('img/%s.png' % p_title.lower().replace(' ', '_'), bbox_inches='tight')
-		else:
-			fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')	
+################### MAIN PLOTTING FUNCTIONS DONE ###############################
+################### HELPER FUNCTIONS ###########################################
 
-def plot_freq_noagg(data, title=None, x_axis='', loglog=False, b=2, save=False):
-        fig = plt.figure()
 
-        lists = sorted(data.items())
-        x, y = zip(*lists)
+def autolabelh(rects, ax):
+    """
+    Attach a text label above each bar displaying its height
+    """
+    for rect in rects:
+        width = rect.get_width()
+        ax.text(1.05*width, rect.get_y() + rect.get_height()/2.,
+                int(width),
+               va='center')
 
-        if loglog:
-       	        plt.loglog(x, y, basex=b)
-        else:
-                plt.plot(x, y)
-        plt.ylabel('Frequency')
-        plt.xlabel(x_axis)
-        if title:
-                if loglog:
-                        p_title = 'Distribution of %s (log-log)' % title
-                else:
-                        p_title = 'Distribution of %s' % title
-                plt.title(p_title)
-        plt.show()
-        if save:
-                if title:
-                        fig.savefig('img/%s.png' % p_title.lower().replace(' ', '_'), bbox_inches='tight')
-                else:
-                        fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
+def autolabel(rects, ax):
+	"""
+	Attach a text label above each bar displaying its height
+	"""
+	for rect in rects:
+		height = rect.get_height()
+		print(height)
+		ax.text(rect.get_x() + rect.get_width()/2., 1.05*height,
+			round(height,2), fontsize=10,
+			ha='center', va='bottom')
+
+###### HELPER FUNCTIONS DONE ###########
+###### DEPRECATED ######################
+
+def lmplot(dist1, dist2):
+    """
+    Plot correlation between two variables with LM plot, to estimate the shape of the distribution.
+    """
+    data={
+        'form frequency': dist1,
+        'accuracy': dist2
+    }
+    df=pd.DataFrame(data)
+    ax = sns.lmplot(data=df, x='form frequency', y='accuracy', lowess=True)
+
 
 def frequency_correlation(freq_dist, other_dist, min_frequency=0, title=None, x_label='', y_label='', xlim=None, save=False):
-
+	"""
+	Plot a frequency correlation between two valiables, both given with dictionaries, that share keys.
+	"""
 	fig = plt.figure()
 
 
@@ -430,89 +272,37 @@ def frequency_correlation(freq_dist, other_dist, min_frequency=0, title=None, x_
 		else:
 			fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
 
-################# SYSTEM UTILS #####################
 
-def overall_performance_prf(articles, skip_nils=True, skip_nonnils=False):
-	tp=0
-	fn=0
-	fp=0
-	for article in articles:
-		for entity in article.entity_mentions:
-			if skip_nils and entity.gold_link=='--NME--':
-		    		continue
-			if skip_nonnils and entity.gold_link!='--NME--':
-				continue
-			if entity.gold_link==entity.sys_link:
-		    		tp+=1
-			else: 
-				if entity.sys_link!='--NME--':
-					fp+=1
-				if entity.gold_link!='--NME--':
-					fn+=1
-	print(tp, fp, fn)
-	p=tp/(tp+fp)
-	r=tp/(tp+fn)
-	f1=2*p*r/(p+r)
-	print(p,r,f1)
-	return f1
+def annotated_heatmap(x_labels, y_labels, values, x_lbl='levels'):
+    """
+    Draw a heat map from three lists, one with X labels, one with Y labels, and one with the values to be shown.
+    """
+    x=[]
+    y=[]
+    vals=[]
+    i=0
+    for x_val in x_labels:
+        for y_val in y_labels:
+            x.append(x_val)
+            y.append(y_val)
+            vals.append(values[i])
+            i+=1
+    print(x, y, vals)
 
-
-def overall_performance(articles, skip_nils=True, skip_nonnils=False):
-	correct=0
-	total=0
-	for article in articles:
-		for entity in article.entity_mentions:
-			if skip_nils and entity.gold_link=='--NME--':
-		    		continue
-			if skip_nonnils and entity.gold_link!='--NME--':
-				continue
-			if entity.gold_link==entity.sys_link:
-		    		correct+=1
-			total+=1
-	print(correct, total)
-	return correct/total
-
-def prepare_ranks(correct_per_form, total_per_form, min_frequency=0):
-    correct_per_rank=defaultdict(int)
-    total_per_rank=defaultdict(int)    
-    for form, data in total_per_form.items():
-        if sum(data.values())<=min_frequency:
-            continue
-        elif min_frequency>0:
-            print(form)
-        sorted_by_rank=sorted(data.items(), key=lambda x:x[1], reverse=True)
-        rank=1
-        for ranked_URI, freq in sorted_by_rank:
-            correct_per_rank[rank]+=correct_per_form[form][ranked_URI]
-            total_per_rank[rank]+=freq
-            rank+=1
-    return correct_per_rank, total_per_rank
-
-def plot_ranks(correct_per_rank, total_per_rank, title='', save=False):
-
-    fig = plt.figure()
-
-    acc_per_rank=defaultdict(float)
-    for rank, total in total_per_rank.items():
-        acc_per_rank[rank]=correct_per_rank[rank]/total
-    print(acc_per_rank)
+    data={}
+    data['dataset']=x
+    data[x_lbl]=y
+    data['values']=vals
     
-    dist1=list(acc_per_rank.keys())
-    dist2=list(acc_per_rank.values())
+    fig, ax = plt.subplots(figsize=(len(y_labels)+3,0.75*len(x_labels)))         # Sample figsize in inches
+    
+    df = pd.DataFrame.from_dict(data)
+    
+    result = df.pivot(index='dataset', columns=x_lbl, values='values')
 
-    plt.plot(dist1, dist2, 'b-o')
-    plt.title(title)
-    plt.xlabel("Rank")
-    plt.ylabel("Accuracy")
-    plt.show()
+    print(result)
+    ax = sns.heatmap(data=result, annot=True, fmt="d", cmap='cubehelix', )
+    
+    fig.savefig('img/%s.png' % x_lbl)
 
-    if save:
-        if title:
-            fig.savefig('img/%s.png' % title.lower().replace(' ', '_'), bbox_inches='tight')
-        else:
-            fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
-
-    correlation, significance = spearmanr(dist1, dist2)
-    print('The Spearman correlation between X and Y is:', correlation, '. Significance: ', significance)
-
-
+#####################################################################

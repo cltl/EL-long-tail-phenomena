@@ -1,5 +1,6 @@
 import redis
 import urllib.parse
+import pickle
 
 rds=redis.Redis()
 
@@ -20,3 +21,10 @@ def getLinkRedirect(link):
         else:
                 return link
 
+def store_dataset(title, articles):    
+    with open('bin/%s.bin' % title, 'wb') as outfile:
+        pickle.dump(articles, outfile)
+        
+def store_system_data(dataset, system, articles):    
+    with open('bin/%s_%s.bin' % (dataset, system), 'wb') as outfile:
+        pickle.dump(articles, outfile)
