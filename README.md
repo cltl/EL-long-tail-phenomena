@@ -16,7 +16,6 @@ There are several Python files with utility functions that are used in these not
 * `classes.py` contains definition of the main classes we deal with in this project. Above all, these are: EntityMention and NewsItem.
 * `dataparser.py` contains functions to load data in different formats, and produce class objects as instances.
 * `load_utils.py` contains additional functions that are helpful with the data loading process.
-* `systemparser.py` contains functions to run the systems against the evaluation data.
 * `analysis_utils.py` contains functions for manipulation and conversion of the data, for analysis, and for evaluation.
 * `plot_utils.py` has several main plotting functions.
 

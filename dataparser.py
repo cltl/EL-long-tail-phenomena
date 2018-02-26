@@ -9,6 +9,9 @@ from lxml import etree
 import glob
 
 def load_article_from_nif_file(nif_file, limit=1000000, collection='wes2015'):
+    """
+    Load a dataset in NIF format.
+    """
 	g=Graph()
 	g.parse(nif_file, format="n3")
 
@@ -55,6 +58,9 @@ def load_article_from_nif_file(nif_file, limit=1000000, collection='wes2015'):
 
 
 def load_article_from_conll_file(conll_file):
+    """
+    Load a dataset in CoNLL format.
+    """
 	lines=open(conll_file, 'r', encoding='utf-8')
 	news_items=set()
 
@@ -103,6 +109,9 @@ def load_article_from_conll_file(conll_file):
 	return news_items
 
 def load_article_from_xml_files(location, collection='msnbc'):
+    """
+    Load a dataset in XML format.
+    """
 	news_items=set()
 	for filename in glob.glob(location):
 		parser = etree.XMLParser(recover=True)
@@ -130,6 +139,9 @@ def load_article_from_xml_files(location, collection='msnbc'):
 	return news_items
 
 def load_article_from_naf_file(filename, collection='sm'):
+    """
+    Load a dataset in NAF format.
+    """
 	parser = etree.XMLParser(recover=True)
 	xml = etree.parse(filename, parser)
 	news_item_obj = classes.NewsItem(
@@ -166,6 +178,4 @@ def load_article_from_naf_file(filename, collection='sm'):
 	return news_item_obj
 
 #load_article_from_nif_file("data/wes2015-dataset-nif-1.2.rdf", 1)
-#load_article_from_naf_file("naf/123ffd96-2b39-42f8-a961-428210b29ea5.in.naf")
-#load_article_from_naf_file("naf/123a3f1d-483c-427b-8749-db298859b836.in.naf")
 #load_article_from_xml_files('data/WikificationACL2011Data/MSNBC/Problems/*')
