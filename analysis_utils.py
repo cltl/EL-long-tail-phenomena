@@ -1,3 +1,4 @@
+from scipy.stats import pearsonr, spearmanr
 from collections import Counter, OrderedDict, defaultdict
 import numpy as np
 from scipy.stats import linregress
@@ -71,7 +72,7 @@ def get_instance_distribution(articles, instance):
                                 references[form]+=1
         return sorted(references.items(), key=lambda x: x[1], reverse=True)
 
-def get_pageranks(articles, skip_zeros=False):
+def get_pageranks(articles, skip_zeros=False, ambiguous_only=False, ambiguous_forms=set()):
         """
         Obtain PageRank values and store in different dictionaries.
         """
@@ -81,6 +82,8 @@ def get_pageranks(articles, skip_zeros=False):
         pr_uniq_sets=defaultdict(set)
         for article in articles:
                 for mention in article.entity_mentions:
+                        if ambiguous_only and mention.mention not in ambiguous_forms:
+                            continue
                         h=int(mention.gold_pr/1)
                         if not skip_zeros or h!=0:
                                 pagerank_frequency[h]+=1
@@ -222,6 +225,23 @@ def get_freq_intervals(forms_by_count):
         mx = max(counts)
         interval_per_bucket[freq] = (mn,mx)
     return interval_per_bucket
+
+def compute_counts_by_form(articles, skip_nils=True):
+    """
+    Compute counts by form. 
+    """
+    total_by_form = defaultdict(int)
+    forms_by_count=defaultdict(set)
+
+    for article in articles:
+        for entity in article.entity_mentions:
+            if entity.sys_link and (not skip_nils or entity.gold_link!='--NME--'):
+                total_by_form[entity.mention]+=1
+
+    for form, count in total_by_form.items():
+        forms_by_count[count].add(form)
+
+    return forms_by_count
 
 ################# RETRIEVAL AND ANALYSIS DONE ########################
 

@@ -142,7 +142,9 @@ def plot_scores(scores, title=''):
 	evals = np.unique(dpoints[:,0])
 	systems = np.unique(dpoints[:,1])
 
-	evals=['overall', 'ambiguous forms', 'forms with nils & non-nils' ]
+	systems=[s.upper() for s in systems]
+
+	evals=['overall', 'ambiguous forms'] #, 'forms with nils & non-nils' ]
 	colors=['#222222', '#666666', '#aaaaaa']
 	print(evals)
 	print(systems)
@@ -167,7 +169,7 @@ def plot_scores(scores, title=''):
 	plt.setp(plt.xticks()[1], rotation=0)    
 
 	ax.set_ylim(ymax=1.1)
-	ax.set_ylabel("F1-score")
+	ax.set_ylabel("F1-SCORE")
 
 	handles, labels = ax.get_legend_handles_labels()
 	legend = ax.legend(handles[::1], labels[::1], loc='upper center', bbox_to_anchor=(0.22, 1.02),  shadow=True, ncol=1, frameon=1)
