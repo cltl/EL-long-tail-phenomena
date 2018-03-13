@@ -37,6 +37,11 @@ We also use the Redis database and its Python client to cache some data.
 
 This project has been coded and tested on a computer with Python v3.6.
 
+Hence, please make sure that:
+* **You can run a Python version 3.6 or similar**
+* **You have installed the modules specified above.**
+* **You have installed Redis on your machine and its [Python client](https://pypi.python.org/pypi/redis)
+
 #### 2.2. Preparing complementary DBpedia data: PageRank values, redirects, and disambiguation values
 
 We pre-load three types of DBpedia data in a Redis database for quick access during the analysis. These are:
@@ -51,7 +56,7 @@ Section 4 of the paper is based on the notebook `Data Analysis.ipynb`. This note
 
 Section 5 is based mostly on the notebook `System Analysis (Micro).ipynb`, and complemented by some findings from the notebook `System Analysis (Macro).ipynb`. These two notebooks rely on the objects that are pre-cached by the `Load.ipynb` notebook, containing the system disambiguation output by all systems on the datasets.
 
-Feel welcome to rerun the notebook to validate and inspect their results. All analysis notebooks run really quick (within a minute). The `Load.ipynb` notebook takes longer to run, around two hours in total.
+Feel welcome to rerun the notebook to validate and inspect their results. All analysis notebooks run really quick (within a minute). The `Load.ipynb` notebook takes longer to run, around two hours in total, so perhaps it is a good idea not to rerun this one.
 
 The green markers inside the notebooks help the reader relate the analysis in the notebook to the plots in the paper. For example, in `Data analysis` part 6) PageRank distribution of instances, we have a pointer "Section 4.2 of the paper".
 
