@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# Filip Ilievski
-# December 2016
 
 import classes
 from rdflib import Graph, URIRef
