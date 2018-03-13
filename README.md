@@ -40,7 +40,7 @@ This project has been coded and tested on a computer with Python v3.6.
 Hence, please make sure that:
 * **You can run a Python version 3.6 or similar**
 * **You have installed the modules specified above.**
-* **You have installed Redis on your machine and its [Python client](https://pypi.python.org/pypi/redis)
+* **You have installed Redis and its [Python client](https://pypi.python.org/pypi/redis) on your machine**
 
 #### 2.2. Preparing complementary DBpedia data: PageRank values, redirects, and disambiguation values
 
