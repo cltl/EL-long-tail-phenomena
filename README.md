@@ -27,7 +27,25 @@ There are several Python files with utility functions that are used in these not
 * `debug/` contains additional debugging logs or files.
 * `img/` stores the plot images (in PNG format) created in this project as an output.
 
-### 2. Running the project
+### 2. Before running the project
+
+#### 2.1. Dependencies
+
+We use the usual Python modules for statistical analysis, data manipulation, and plotting: scipy, numpy, collections, matplotlib, seaborn, pickle, collections, pandas, rdflib, and lxml.
+
+We also use the Redis database and its Python client to cache some data.
+
+This project has been coded and tested on a computer with Python v3.6.
+
+#### 2.2. Preparing complementary DBpedia data: PageRank values, redirects, and disambiguation values
+
+We pre-load three types of DBpedia data in a Redis database for quick access during the analysis. These are:
+* PageRank values from [http://people.aifb.kit.edu/ath/](http://people.aifb.kit.edu/ath/).
+* disambiguation links and redirect links from [http://wiki.dbpedia.org/downloads-2016-04](http://wiki.dbpedia.org/downloads-2016-04).
+
+For replication purposes, please simply run the bash script `prepare_redis_data.sh` to: download these files, place them in the correct place locally, and cache them in Redis.
+
+### 3. Running the project
 
 Section 4 of the paper is based on the notebook `Data Analysis.ipynb`. This notebook uses the dataset objects as pre-cached by the `Load.ipynb` notebook.
 
@@ -37,8 +55,3 @@ Feel welcome to rerun the notebook to validate and inspect their results. All an
 
 The green markers inside the notebooks help the reader relate the analysis in the notebook to the plots in the paper. For example, in `Data analysis` part 6) PageRank distribution of instances, we have a pointer "Section 4.2 of the paper".
 
-### 3. Dependencies
-
-We use the usual Python modules for statistical analysis, data manipulation, and plotting: scipy, numpy, collections, matplotlib, seaborn, pickle, collections. 
-
-This project has been coded and tested on a computer with Python v3.6.
