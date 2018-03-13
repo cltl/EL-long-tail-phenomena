@@ -62,7 +62,7 @@ def plot_multi_freq_dist(forms_cnt, kind='', x_axis='Entity mentions', loglog=Fa
                 plt.plot(k,v, color=gray_level, label=title.upper())
         cnt+=1
     plt.legend(loc='upper right', frameon=1)
-    plt.ylabel('Frequency')
+    plt.ylabel('FREQUENCY')
     plt.xlabel(x_axis)
     if kind:
         if loglog:
@@ -78,7 +78,7 @@ def plot_multi_freq_dist(forms_cnt, kind='', x_axis='Entity mentions', loglog=Fa
                     fig.savefig('img/%d.png' % random.randint(0,1000000), bbox_inches='tight')
 
 
-def plot_line_with_whiskers(x, y, xl='', yl='', title='', estimators=['mean', 'median'], xlim=None, save=False):
+def plot_line_with_whiskers(x, y, xl='', yl='', title='', estimators=['mean', 'median'], xlim=None, show_title=True, save=False):
     """
     Plot a line with whiskers, showing a standard deviation from the estimator.
     """
@@ -97,7 +97,8 @@ def plot_line_with_whiskers(x, y, xl='', yl='', title='', estimators=['mean', 'm
 
         if title:
             plt_title='%s (estimator=%s)' % (title, est)
-            plt.title(plt_title)
+            if show_title:
+                plt.title(plt_title)
 
         if xlim:
                 ax.set(xlim=(xlim[0], xlim[1]))
@@ -137,7 +138,7 @@ def plot_scores(scores, title=''):
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 
-	space = 0.3
+	space = 0.4
 
 	evals = np.unique(dpoints[:,0])
 	systems = np.unique(dpoints[:,1])
@@ -145,7 +146,7 @@ def plot_scores(scores, title=''):
 	systems=[s.upper() for s in systems]
 
 	evals=['overall', 'ambiguous forms'] #, 'forms with nils & non-nils' ]
-	colors=['#222222', '#666666', '#aaaaaa']
+	colors=['#222222', '#aaaaaa', '#666666']
 	print(evals)
 	print(systems)
 
@@ -160,8 +161,8 @@ def plot_scores(scores, title=''):
 		print("evaluation:", cond)
 
 		vals = dpoints[dpoints[:,0] == cond][:,2].astype(np.float)
-		pos = [j - (1 - space) / 2. + i * width for j in range(1,len(systems)+1)]
-		br = ax.bar(pos, vals, width=width, label=cond, color=colors[i]) #cm.Accent(float(i) / n))
+		pos = [j - (1 - space) / 2. + i * width + width/len(evals) for j in range(1,len(systems)+1)]
+		br = ax.bar(pos, vals, width=width, label=cond, color=colors[i], align = 'center') #cm.Accent(float(i) / n))
 		autolabel(br, ax)
 	    
 	ax.set_xticks(indeces)
@@ -194,8 +195,9 @@ def plot_prf(data, systems, a, maxrank=12, title=''):
         a_list.append(s/len(systems))
     print(np.arange(1,maxrank+1))
     a.plot(np.arange(1,maxrank+1), a_list, 'b-o')
-    a.set_xlabel("Rank")
+    a.set_xlabel("RANK")
     a.set_title(title)
+    a.xaxis.set_ticks(np.arange(1,maxrank+1))
 
 ################### MAIN PLOTTING FUNCTIONS DONE ###############################
 ################### HELPER FUNCTIONS ###########################################
