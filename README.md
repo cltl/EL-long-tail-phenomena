@@ -64,6 +64,8 @@ The N3-collection of datasets is publicly available [on github](https://github.c
 
 `sh prepare_n3_data.sh`
 
+The second data collection, AIDA, is unfortunately not publicly available. Please get in touch with the paper authors if you are unable to obtain this data.
+
 ### 3. Running the project
 
 Section 4 of the paper is based on the notebook `Data Analysis.ipynb`. This notebook uses the dataset objects as pre-cached by the `Load.ipynb` notebook.
@@ -74,3 +76,6 @@ Feel welcome to rerun the notebook to validate and inspect their results. All an
 
 The green markers inside the notebooks help the reader relate the analysis in the notebook to the plots in the paper. For example, in `Data analysis` part 6) PageRank distribution of instances, we have a pointer "Section 4.2 of the paper".
 
+### 4. Contact
+
+For any questions or comments, please contact Filip via e-mail: `f.ilievski@vu.nl`.
