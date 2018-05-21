@@ -58,7 +58,11 @@ We pre-load three types of DBpedia data in a Redis database for quick access dur
 
 For replication purposes, please simply run the bash script `prepare_redis_data.sh` to: download these files, place them in the correct place locally, and cache them in Redis. Note that this script takes some time to execute (around 1.5-2 hours on my laptop).
 
+#### 2.3. Download evaluation data: N3 corpus and AIDA
 
+The N3-collection of datasets is publicly available [on github](https://github.com/dice-group/n3-collection). For your convenience, we prepared a script that downloads this collection and creates the directory assumed by the analysis notebooks. You can run this script without arguments, as follows:
+
+`sh prepare_n3_data.sh`
 
 ### 3. Running the project
 
