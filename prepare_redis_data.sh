@@ -12,10 +12,10 @@ echo "Downloads done. Now extracting the archives to disk..."
 bunzip2 *
 
 echo "Now caching data to Redis..."
+
+cd ..
+
 python3 cache_data.py
 
 echo "Caching done. Now removing the files..."
-rm *.ttl
-rm *.tsv
-
-cd ..
+rm -r to_cache

@@ -1,4 +1,4 @@
-import utils
+import load_utils as utils
 from rdflib import Graph, URIRef
 import redis
 
