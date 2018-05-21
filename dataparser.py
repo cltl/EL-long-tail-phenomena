@@ -7,9 +7,9 @@ from lxml import etree
 import glob
 
 def load_article_from_nif_file(nif_file, limit=1000000, collection='wes2015'):
-    """
-    Load a dataset in NIF format.
-    """
+	"""
+	Load a dataset in NIF format.
+	"""
 	g=Graph()
 	g.parse(nif_file, format="n3")
 
@@ -56,9 +56,9 @@ def load_article_from_nif_file(nif_file, limit=1000000, collection='wes2015'):
 
 
 def load_article_from_conll_file(conll_file):
-    """
-    Load a dataset in CoNLL format.
-    """
+	"""
+	Load a dataset in CoNLL format.
+	"""
 	lines=open(conll_file, 'r', encoding='utf-8')
 	news_items=set()
 
@@ -107,9 +107,9 @@ def load_article_from_conll_file(conll_file):
 	return news_items
 
 def load_article_from_xml_files(location, collection='msnbc'):
-    """
-    Load a dataset in XML format.
-    """
+	"""
+	Load a dataset in XML format.
+	"""
 	news_items=set()
 	for filename in glob.glob(location):
 		parser = etree.XMLParser(recover=True)
@@ -135,45 +135,6 @@ def load_article_from_xml_files(location, collection='msnbc'):
 			news_item_obj.entity_mentions.append(entity_obj)
 		news_items.add(news_item_obj)
 	return news_items
-
-def load_article_from_naf_file(filename, collection='sm'):
-    """
-    Load a dataset in NAF format.
-    """
-	parser = etree.XMLParser(recover=True)
-	xml = etree.parse(filename, parser)
-	news_item_obj = classes.NewsItem(
-		identifier=filename,
-		collection=collection
-	)
-	for entity_mention in xml.iterfind('entities/entity'):
-
-		iden2wf_el = {int(wf_el.get('id')[1:]): wf_el
-			for wf_el in xml.iterfind('text/wf')}
-
-
-		idens = [int(t_id.get('id')[1:])
-			for t_id in entity_mention.iterfind('references/span/target')]
-		# get mention
-		mention = ' '.join([iden2wf_el[iden].text
-			for iden in idens])
-		# get start and end offset
-		wf_el = iden2wf_el[idens[0]]
-		begin_index = int(wf_el.get('offset'))
-
-		if len(idens) == 1:
-			end_index = begin_index + int(wf_el.get('length'))
-		else:
-			end_wf_el = iden2wf_el[idens[-1]]
-			end_index = int(end_wf_el.get('offset')) + int(end_wf_el.get('length'))
-
-		entity_obj = classes.EntityMention(
-			begin_index=begin_index,
-			end_index=end_index,
-			mention=mention
-		)
-		news_item_obj.entity_mentions.append(entity_obj)
-	return news_item_obj
 
 #load_article_from_nif_file("data/wes2015-dataset-nif-1.2.rdf", 1)
 #load_article_from_xml_files('data/WikificationACL2011Data/MSNBC/Problems/*')

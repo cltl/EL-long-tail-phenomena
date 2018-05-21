@@ -56,7 +56,9 @@ We pre-load three types of DBpedia data in a Redis database for quick access dur
 * PageRank values from [http://people.aifb.kit.edu/ath/](http://people.aifb.kit.edu/ath/).
 * disambiguation links and redirect links from [http://wiki.dbpedia.org/downloads-2016-04](http://wiki.dbpedia.org/downloads-2016-04).
 
-For replication purposes, please simply run the bash script `prepare_redis_data.sh` to: download these files, place them in the correct place locally, and cache them in Redis.
+For replication purposes, please simply run the bash script `prepare_redis_data.sh` to: download these files, place them in the correct place locally, and cache them in Redis. Note that this script takes some time to execute (around 1.5-2 hours on my laptop).
+
+
 
 ### 3. Running the project
 
