@@ -1,12 +1,12 @@
 # EL-long-tail-phenomena
-This repository contains the entire code for the analysis reported in the COLING 2018 paper:
+This repository contains the entire code for the analysis reported in the following COLING 2018 paper:
 
 ```
   @inproceedings{ilievski2018systematic,
-   	title = {Systematic Study of Long Tail Phenomena in Entity Linking},
-    author={Ilievski, Filip and Vossen, Piek and Schlobach, Stefan},
-    booktitle={proceedings of COLING},
-    year = {2018}}
+        title = {Systematic Study of Long Tail Phenomena in Entity Linking},
+        author={Ilievski, Filip and Vossen, Piek and Schlobach, Stefan},
+        booktitle={proceedings of COLING},
+        year = {2018}}
 ```
 
 ### 1. Description of the data structure
