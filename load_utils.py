@@ -5,6 +5,7 @@ import json
 import urllib.request
 from urllib.request import urlopen, Request
 from urllib.parse import urlencode
+from copy import deepcopy
 
 rds=redis.Redis()
 
@@ -36,12 +37,16 @@ def getLinkRedirect(link):
     else:
         return link
 
-def store_dataset(title, articles):  
+def store_dataset(title, articles, anonymize_content=False):  
     """
     Store a dataset object to a pickle file.
-    """  
+    """ 
+    new_articles = deepcopy(articles)
+    if anonymize_content: 
+        for article in new_articles:
+            article.content=''
     with open('bin/%s.bin' % title, 'wb') as outfile:
-        pickle.dump(articles, outfile)
+        pickle.dump(new_articles, outfile)
 
 def disambiguate_agdistis(xml_text, type='agdistis'):
 	"""
@@ -52,9 +57,13 @@ def disambiguate_agdistis(xml_text, type='agdistis'):
 	this_json = urlopen(request).read().decode()
 	return json.loads(this_json)
         
-def store_system_data(dataset, system, articles):
+def store_system_data(dataset, system, articles, anonymize_content=False):
     """
     Store an object containing system-processed data to a pickle file.
-    """  
+    """ 
+    new_articles = deepcopy(articles) 
+    if anonymize_content: 
+        for article in new_articles:
+            article.content=''
     with open('bin/%s_%s.bin' % (dataset, system), 'wb') as outfile:
-        pickle.dump(articles, outfile)
+        pickle.dump(new_articles, outfile)
