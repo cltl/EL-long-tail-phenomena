@@ -55,11 +55,11 @@ def load_article_from_nif_file(nif_file, limit=1000000, collection='wes2015'):
 	return news_items
 
 
-def load_article_from_conll_file(conll_file):
+def load_article_from_tsv_file(tsv_file):
 	"""
-	Load a dataset in CoNLL format.
+	Load a dataset in TSV format.
 	"""
-	lines=open(conll_file, 'r', encoding='utf-8')
+	lines=open(tsv_file, 'r', encoding='utf-8')
 	news_items=set()
 
 	current_file=''

@@ -66,13 +66,15 @@ The N3-collection of datasets is publicly available [on github](https://github.c
 
 The second data collection, AIDA, is unfortunately not publicly available. Please get in touch with the paper authors if you are unable to obtain this data.
 
+**To enable easier replicability and work around the proprietary dataset AIDA, we provide the .bin files that are created in the first step in this project by the `Load.ipynb` notebook. This allows users to avoid the obstacle of a private/paid dataset, re-runing the EL linking systems and storing the data on disk themselves, while still enabling them to run the entire analysis that supports the paper findings and inspect the underlying data. Note that these .bin files contain only the set of entities with their mentions, thus still preserving the commercial aspect of AIDA.**
+
 ### 3. Running the project
 
-Section 4 of the paper is based on the notebook `Data Analysis.ipynb`. This notebook uses the dataset objects as pre-cached by the `Load.ipynb` notebook.
+Section 4 of the paper is based on the notebook `Data Analysis.ipynb`. This notebook uses the dataset `.bin` objects as downloaded from github or pre-cached by the `Load.ipynb` notebook.
 
-Section 5 is based mostly on the notebook `System Analysis (Micro).ipynb`, and complemented by some findings from the notebook `System Analysis (Macro).ipynb`. These two notebooks rely on the objects that are pre-cached by the `Load.ipynb` notebook, containing the system disambiguation output by all systems on the datasets.
+Section 5 is based mostly on the notebook `System Analysis (Micro).ipynb`, and complemented by some findings from the notebook `System Analysis (Macro).ipynb`. These two notebooks rely on the `.bin` objects that are downloaded from github or pre-cached by the `Load.ipynb` notebook, containing the system disambiguation output by all systems on the datasets.
 
-Feel welcome to rerun the notebook to validate and inspect their results. All analysis notebooks run really quick (within a minute). The `Load.ipynb` notebook takes longer to run, around two hours in total, so perhaps it is a good idea not to rerun this one.
+Feel welcome to rerun the notebook to validate and inspect their results. All analysis notebooks run really quick (within a minute). The `Load.ipynb` notebook takes longer to run (around 2 hours in total) and expects one non-public dataset, AIDA (as discussed in 2.3), hence perhaps it is a good idea not to make use of the provided `.bin` files.
 
 The green markers inside the notebooks help the reader relate the analysis in the notebook to the plots in the paper. For example, in `Data analysis` part 6) PageRank distribution of instances, we have a pointer "Section 4.2 of the paper".
 
