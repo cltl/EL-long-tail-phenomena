@@ -60,13 +60,19 @@ For replication purposes, please simply run the bash script `prepare_redis_data.
 
 #### 2.3. Download evaluation data: N3 corpus and AIDA
 
+**Option 1: Obtain the data and prepare for processing**
+
+To run the entire project, including the retrieval of the system output by running the tools, users need to first obtain the datasets.
+
 The N3-collection of datasets is publicly available [on github](https://github.com/dice-group/n3-collection). For your convenience, we prepared a script that downloads this collection and creates the directory assumed by the analysis notebooks. You can run this script without arguments, as follows:
 
 `sh prepare_n3_data.sh`
 
-The second data collection, AIDA, is unfortunately not publicly available. Please get in touch with the paper authors if you are unable to obtain this data.
+The second data collection, AIDA, is unfortunately not publicly available. It needs to be obtained from the LDC catalog.
 
-**To enable easier replicability and work around the proprietary dataset AIDA, we provide the .bin files that are created in the first step in this project by the `Load.ipynb` notebook. This allows users to avoid the obstacle of a private/paid dataset, re-runing the EL linking systems and storing the data on disk themselves, while still enabling them to run the entire analysis that supports the paper findings and inspect the underlying data. Note that these .bin files contain only the set of entities with their mentions, thus still preserving the commercial aspect of AIDA.**
+**Option 2 (preferred): Skip running the tools and use pre-cached .bin files**
+
+To enable easier replicability and work around the proprietary dataset AIDA, we provide the .bin files that are created in the first step in this project by the `Load.ipynb` notebook. This allows users to avoid the obstacle of a non-public dataset, to avoid re-runing the EL linking systems and storing the data on disk themselves, while still enabling them to run the entire analysis that supports the paper findings and inspect the underlying data. Note that these .bin files contain only the set of entities with their mentions, thus still preserving the commercial aspect of AIDA.
 
 ### 3. Running the project
 
