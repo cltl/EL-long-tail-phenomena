@@ -9,6 +9,8 @@ This repository contains the entire code for the analysis reported in the follow
         year = {2018}}
 ```
 
+This paper was presented at COLING 2018. Slides can be found [here](https://www.slideshare.net/FilipIlievski1/systematic-study-of-long-tail-phenomena-in-entity-linking).
+
 ### 1. Description of the data structure
 
 #### 1.1. Notebooks
